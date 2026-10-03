@@ -6,48 +6,18 @@
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  const ATLAS_PARTS = [
-    'assets/atlas/part-00.b64','assets/atlas/part-01.b64','assets/atlas/part-02.b64','assets/atlas/part-03.b64'
-    'assets/atlas/part-04.b64','assets/atlas/part-05.b64','assets/atlas/part-06.b64','assets/atlas/part-07.b64'
-    'assets/atlas/part-08.b64','assets/atlas/part-09.b64','assets/atlas/part-10.b64','assets/atlas/part-11.b64'
-    'assets/atlas/part-12.b64','assets/atlas/part-13.b64','assets/atlas/part-14.b64','assets/atlas/part-15.b64'
-    'assets/atlas/part-16.b64','assets/atlas/part-17.b64','assets/atlas/part-18.b64','assets/atlas/part-19.b64'
-    'assets/atlas/part-20.b64','assets/atlas/part-21.b64','assets/atlas/part-22.b64','assets/atlas/part-23.b64'
-    'assets/atlas/part-24.b64','assets/atlas/part-25.b64','assets/atlas/part-26.b64','assets/atlas/part-27.b64'
-    'assets/atlas/part-28.b64','assets/atlas/part-29.b64','assets/atlas/part-30.b64','assets/atlas/part-31.b64'
-    'assets/atlas/part-32.b64','assets/atlas/part-33.b64'
-  ];
-
   const atlas = new Image();
   let atlasReady = false;
   let atlasError = null;
 
-  async function loadPackedAtlas() {
-    try {
-      const chunks = await Promise.all(ATLAS_PARTS.map(async url => {
-        const response = await fetch(url, { cache: 'force-cache' });
-        if (!response.ok) throw new Error(`Atlas part failed: ${url} (${response.status})`);
-        return (await response.text()).trim();
-      }));
-      const raw = atob(chunks.join(''));
-      const bytes = new Uint8Array(raw.length);
-      for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-      const objectUrl = URL.createObjectURL(new Blob([bytes], { type: 'image/webp' }));
-      atlas.onload = () => {
-        atlasReady = true;
-        URL.revokeObjectURL(objectUrl);
-      };
-      atlas.onerror = () => {
-        atlasError = new Error('Packed sprite atlas could not be decoded.');
-        URL.revokeObjectURL(objectUrl);
-      };
-      atlas.src = objectUrl;
-    } catch (error) {
-      atlasError = error;
-      console.error(error);
-    }
-  }
-  loadPackedAtlas();
+  atlas.onload = () => {
+    atlasReady = true;
+  };
+  atlas.onerror = (event) => {
+    atlasError = new Error('Game atlas could not be loaded.');
+    console.error('Game atlas load failed:', event);
+  };
+  atlas.src = 'assets/game-atlas.webp?v=7';
 
   const ATLAS = {
     background: { x: 0, y: 0, w: 640, h: 360 },
@@ -338,5 +308,5 @@
   resize();
   requestAnimationFrame(frame);
 
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=6').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=7').catch(() => {});
 })();
