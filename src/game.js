@@ -6,29 +6,27 @@
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  const atlas = new Image();
-  let atlasReady = false;
-  let atlasError = null;
-
-  atlas.onload = () => {
-    atlasReady = true;
+  const loadImage = src => {
+    const img = new Image();
+    img.src = src;
+    return img;
   };
-  atlas.onerror = (event) => {
-    atlasError = new Error('Game atlas could not be loaded.');
-    console.error('Game atlas load failed:', event);
-  };
-  atlas.src = 'assets/game-atlas.webp?v=7';
 
-  const ATLAS = {
-    background: { x: 0, y: 0, w: 640, h: 360 },
+  const bg = loadImage('assets/facility-dusk.webp?v=8');
+  const sprites = {
+    idle: loadImage('assets/animation/regina-idle-right.webp?v=8'),
+    jog: loadImage('assets/animation/regina-jog-right.webp?v=8'),
+    aimRaise: loadImage('assets/animation/regina-aim-raise-right.webp?v=8'),
+    aimHold: loadImage('assets/animation/regina-aim-hold-right.webp?v=8'),
+    fire: loadImage('assets/animation/regina-fire-right.webp?v=8'),
   };
 
   const META = {
-    idle: { frames: 26, cols: 4, cellW: 90, cellH: 160, fps: 12, sheetY: 360 },
-    jog: { frames: 12, cols: 4, cellW: 90, cellH: 160, fps: 12, sheetY: 1480 },
-    aimRaise: { frames: 19, cols: 4, cellW: 90, cellH: 160, fps: 12, sheetY: 1960 },
-    aimHold: { frames: 1, cols: 4, cellW: 90, cellH: 160, fps: 1, sheetY: 2760 },
-    fire: { frames: 7, cols: 4, cellW: 150, cellH: 160, fps: 24, sheetY: 2920 },
+    idle: { frames: 26, cols: 4, cellW: 360, cellH: 640, fps: 12 },
+    jog: { frames: 12, cols: 4, cellW: 360, cellH: 640, fps: 12 },
+    aimRaise: { frames: 8, cols: 4, cellW: 420, cellH: 640, fps: 15 },
+    aimHold: { frames: 1, cols: 1, cellW: 420, cellH: 640, fps: 1 },
+    fire: { frames: 8, cols: 4, cellW: 600, cellH: 640, fps: 24 },
   };
 
   const input = { left: false, right: false, aim: false };
@@ -112,6 +110,8 @@
     if (ev) ev.preventDefault();
     if (state.ammo <= 0) return;
 
+    // Semi-auto input buffering: a tap made during the last recoil frames or
+    // while the pistol is almost raised is remembered instead of being lost.
     if (state.fireTime >= 0) {
       if (input.aim) state.fireQueued = true;
       return;
@@ -147,6 +147,7 @@
   }
 
   function update(dt) {
+    // Aiming plants the feet for the combat animation.
     const canMove = state.aimProgress < 0.04 && state.fireTime < 0;
     const dir = canMove ? ((input.right ? 1 : 0) - (input.left ? 1 : 0)) : 0;
     state.targetSpeed = dir * PLAYER.speed;
@@ -165,8 +166,11 @@
       state.idleClock = 0;
     }
 
-    const aimInSeconds = 0.52;
-    const aimOutSeconds = 0.30;
+    // New 8-frame wield sequence: quick, planted, and readable without the old
+    // long video-derived raise.  The support hand joins naturally as the pistol
+    // comes onto the sight line.
+    const aimInSeconds = 0.42;
+    const aimOutSeconds = 0.25;
     if (input.aim || state.fireTime >= 0) {
       state.aimProgress = Math.min(1, state.aimProgress + dt / aimInSeconds);
     } else {
@@ -180,6 +184,8 @@
       const duration = META.fire.frames / META.fire.fps;
       if (state.fireTime >= duration) {
         state.fireTime = -1;
+        // If the player tapped FIRE during recoil, immediately begin the next
+        // semi-auto cycle once the first one has recovered to the sight picture.
         if (state.fireQueued && input.aim && state.ammo > 0) startFire();
       }
     } else if (state.fireQueued && input.aim && state.aimProgress >= 0.94) {
@@ -198,12 +204,11 @@
   }
 
   function drawBackground(w, h) {
-    const b = ATLAS.background;
-    const r = coverRect(b.w, b.h, w, h);
+    const r = coverRect(bg.width, bg.height, w, h);
     const panRange = Math.max(0, r.w - w);
     const pan = (state.x - WORLD.minX) / (WORLD.maxX - WORLD.minX);
     const camX = panRange ? -pan * panRange : 0;
-    ctx.drawImage(atlas, b.x, b.y, b.w, b.h, r.x + camX, r.y, r.w, r.h);
+    ctx.drawImage(bg, r.x + camX, r.y, r.w, r.h);
 
     const grad = ctx.createLinearGradient(0, h * .55, 0, h);
     grad.addColorStop(0, 'rgba(2,5,8,0)');
@@ -212,11 +217,11 @@
     ctx.fillRect(0, 0, w, h);
   }
 
-  function drawSheetFrame(meta, frameIndex, dx, dy, dw, dh) {
+  function drawSheetFrame(img, meta, frameIndex, dx, dy, dw, dh) {
     const f = Math.max(0, Math.min(meta.frames - 1, frameIndex | 0));
     const sx = (f % meta.cols) * meta.cellW;
-    const sy = meta.sheetY + Math.floor(f / meta.cols) * meta.cellH;
-    ctx.drawImage(atlas, sx, sy, meta.cellW, meta.cellH, dx, dy, dw, dh);
+    const sy = Math.floor(f / meta.cols) * meta.cellH;
+    ctx.drawImage(img, sx, sy, meta.cellW, meta.cellH, dx, dy, dw, dh);
   }
 
   function chooseAnimation() {
@@ -252,6 +257,7 @@
   function drawPlayer(w, h) {
     const anim = chooseAnimation();
     const meta = META[anim.key];
+    const img = sprites[anim.key];
 
     const drawH = h * PLAYER.spriteCellHeight;
     const drawW = drawH * (meta.cellW / meta.cellH);
@@ -268,12 +274,12 @@
     ctx.ellipse(0, 1, drawW * .20, h * .010, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    drawSheetFrame(meta, anim.frame, -drawW * .5, topY, drawW, drawH);
+    drawSheetFrame(img, meta, anim.frame, -drawW * .5, topY, drawW, drawH);
     ctx.restore();
   }
 
   function allReady() {
-    return atlasReady && atlas.complete && atlas.naturalWidth;
+    return bg.complete && bg.naturalWidth && Object.values(sprites).every(img => img.complete && img.naturalWidth);
   }
 
   function drawLoading(w, h) {
@@ -282,7 +288,7 @@
     ctx.fillStyle = '#c8d3d6';
     ctx.font = '700 16px system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(atlasError ? 'FIELD LINK ASSET ERROR — RELOAD' : 'INITIALIZING FIELD LINK…', w / 2, h / 2);
+    ctx.fillText('INITIALIZING FIELD LINK…', w / 2, h / 2);
   }
 
   function frame(now) {
@@ -308,5 +314,5 @@
   resize();
   requestAnimationFrame(frame);
 
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=7').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=8').catch(() => {});
 })();

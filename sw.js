@@ -1,11 +1,13 @@
-const CACHE = 'containment-poc-v7-web';
+const CACHE = 'containment-poc-v8-new-fire';
 const ASSETS = [
-  './',
-  './index.html',
-  './src/game.css?v=7',
-  './src/game.js?v=7',
-  './manifest.webmanifest',
-  './assets/game-atlas.webp?v=7'
+  './', './index.html', './src/game.css?v=8', './src/game.js?v=8', './manifest.webmanifest',
+  './assets/facility-dusk.webp?v=8',
+  './assets/animation/regina-idle-right.webp?v=8',
+  './assets/animation/regina-jog-right.webp?v=8',
+  './assets/animation/regina-aim-raise-right.webp?v=8',
+  './assets/animation/regina-aim-hold-right.webp?v=8',
+  './assets/animation/regina-fire-right.webp?v=8',
+  './assets/animation/sprites.json'
 ];
 self.addEventListener('install', event => {
   self.skipWaiting();

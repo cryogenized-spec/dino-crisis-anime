@@ -1,0 +1,118 @@
+{
+  "idle": {
+    "file": "regina-idle-right.webp",
+    "frames": 26,
+    "cellWidth": 360,
+    "cellHeight": 640,
+    "columns": 4,
+    "rows": 7,
+    "sourceFrames": [
+      172,
+      174,
+      176,
+      178,
+      180,
+      182,
+      184,
+      186,
+      188,
+      190,
+      192,
+      194,
+      196,
+      198,
+      200,
+      202,
+      204,
+      206,
+      208,
+      210,
+      212,
+      214,
+      216,
+      218,
+      220,
+      222
+    ],
+    "registration": {
+      "targetCharacterHeight": 505.0,
+      "targetGroundY": 565,
+      "targetCenterX": 180,
+      "sourceMedianCharacterHeight": 1172.0,
+      "sourceMedianGroundY": 1244.0,
+      "scale": 0.430887
+    }
+  },
+  "jog": {
+    "file": "regina-jog-right.webp",
+    "frames": 12,
+    "cellWidth": 360,
+    "cellHeight": 640,
+    "columns": 4,
+    "rows": 3,
+    "sourceFrames": [
+      84,
+      86,
+      88,
+      90,
+      92,
+      94,
+      96,
+      99,
+      101,
+      103,
+      105,
+      107
+    ],
+    "registration": {
+      "targetCharacterHeight": 505.0,
+      "targetGroundY": 565,
+      "targetCenterX": 180,
+      "sourceMedianCharacterHeight": 1238.5,
+      "sourceMedianGroundY": 1267.0,
+      "scale": 0.407751
+    }
+  },
+  "aimRaise": {
+    "file": "regina-aim-raise-right.webp",
+    "frames": 8,
+    "cellWidth": 420,
+    "cellHeight": 640,
+    "columns": 4,
+    "rows": 2,
+    "fps": 15,
+    "source": "anime_tactical_draw_sequence_reference_sheet.png",
+    "registration": {
+      "targetCharacterHeight": 505.0,
+      "targetGroundY": 565,
+      "targetCenterX": 210,
+      "scale": 1.10989
+    }
+  },
+  "aimHold": {
+    "file": "regina-aim-hold-right.webp",
+    "frames": 1,
+    "cellWidth": 420,
+    "cellHeight": 640,
+    "columns": 1,
+    "rows": 1,
+    "fps": 1,
+    "source": "final frame of new aimRaise"
+  },
+  "fire": {
+    "file": "regina-fire-right.webp",
+    "frames": 8,
+    "cellWidth": 600,
+    "cellHeight": 640,
+    "columns": 4,
+    "rows": 2,
+    "fps": 24,
+    "source": "anime_handgun_firing_animation_sheet.png",
+    "registration": {
+      "targetCharacterHeight": 505.0,
+      "targetGroundY": 565,
+      "targetCenterX": 300,
+      "scale": 1.149033
+    }
+  }
+}
