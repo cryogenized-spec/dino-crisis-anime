@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#090d12" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="screen-orientation" content="landscape" />
+  <title>Containment // Proof of Concept</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="src/game.css?v=5" />
+</head>
+<body>
+  <main id="game-shell" aria-label="Dinosaur survival side-scroller proof of concept">
+    <canvas id="game" width="1280" height="720"></canvas>
+
+    <div id="hud" aria-hidden="true">
+      <div class="hud-block status">
+        <span class="eyebrow">S.O.R.T. // FIELD LINK</span>
+        <strong>REGINA</strong>
+        <div class="health"><i></i></div>
+      </div>
+      <div class="hud-block objective">
+        <span class="eyebrow">OBJECTIVE</span>
+        <strong>Reach the research facility</strong>
+      </div>
+      <div class="hud-block ammo">
+        <span class="eyebrow">SIDEARM</span>
+        <strong>17 <small>/ 51</small></strong>
+      </div>
+    </div>
+
+    <div id="touch-ui">
+      <div class="dpad" aria-label="Movement controls">
+        <button id="left" class="control" aria-label="Move left">‹</button>
+        <button id="right" class="control" aria-label="Move right">›</button>
+      </div>
+      <div class="actions" aria-label="Action controls">
+        <button id="aim" class="control action" aria-label="Aim">AIM</button>
+        <button id="fire" class="control action primary" aria-label="Fire">FIRE</button>
+      </div>
+    </div>
+
+    <div id="radio" class="radio hidden" role="status">
+      <span>HQ</span>
+      <p>Containment breach confirmed. Proceed to the facility entrance.</p>
+    </div>
+
+    <div id="portrait-warning">
+      <strong>Rotate device</strong>
+      <span>This prototype is built for landscape play.</span>
+    </div>
+  </main>
+  <script src="src/game.js?v=5"></script>
+</body>
+</html>
